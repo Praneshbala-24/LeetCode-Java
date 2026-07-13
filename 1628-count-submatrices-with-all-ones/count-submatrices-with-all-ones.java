@@ -1,34 +1,56 @@
 class Solution {
     public int numSubmat(int[][] mat) {
-        int r = mat.length, c = mat[0].length;
-        int[] h = new int[c];
-        int ans = 0;
 
-        for (int i = 0; i < r; i++) {
-            for (int j = 0; j < c; j++) {
-                h[j] = (mat[i][j] == 0) ? 0 : h[j] + 1;
+        int rows = mat.length;
+        int cols = mat[0].length;
+
+        int[] height = new int[cols];
+        int answer = 0;
+
+        for (int i = 0; i < rows; i++) {
+
+            // Build histogram
+            for (int j = 0; j < cols; j++) {
+                if (mat[i][j] == 0)
+                    height[j] = 0;
+                else
+                    height[j]++;
             }
-            ans += count(h);
+
+            answer += countHistogram(height);
         }
-        return ans;
+
+        return answer;
     }
 
-    private int count(int[] h) {
-        int n = h.length, res = 0;
+    private int countHistogram(int[] height) {
+
+        int n = height.length;
+
+        int[] stack = new int[n];
+        int top = -1;
+
         int[] sum = new int[n];
-        Deque<Integer> st = new ArrayDeque<>();
+
+        int ans = 0;
 
         for (int i = 0; i < n; i++) {
-            while (!st.isEmpty() && h[st.peek()] >= h[i]) st.pop();
-            if (!st.isEmpty()) {
-                int p = st.peek();
-                sum[i] = sum[p] + h[i] * (i - p);
-            } else {
-                sum[i] = h[i] * (i + 1);
+
+            while (top >= 0 && height[stack[top]] >= height[i]) {
+                top--;
             }
-            st.push(i);
-            res += sum[i];
+
+            if (top == -1) {
+                sum[i] = height[i] * (i + 1);
+            } else {
+                int prev = stack[top];
+                sum[i] = sum[prev] + height[i] * (i - prev);
+            }
+
+            stack[++top] = i;
+            ans += sum[i];
         }
-        return res;
+
+        return ans;
     }
 }
