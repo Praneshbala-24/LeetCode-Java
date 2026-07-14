@@ -1,21 +1,32 @@
 class Solution {
     public boolean hasGroupsSizeX(int[] deck) {
-        Map<Integer,Integer> map = new HashMap<>();
-        for(int i : deck){
-            map.put(i,map.getOrDefault(i,0)+1);
+        if (deck.length <= 1) {
+            return false;
         }
-        int gcd = -1;
-        for (int count : map.values()) {
-            if (gcd == -1) {
-                gcd = count;
-            } else {
-                gcd = findGCD(gcd, count);
+        int max = 0;
+        for (int card : deck) {
+            if (card > max) {
+                max = card;
             }
         }
-        return gcd >= 2;
+        int[] freq = new int[max + 1];
+        for (int card : deck) {
+            freq[card]++;
+        }
+        int overallGcd = 0;
+        for (int count : freq) {
+            if (count > 0) {
+                overallGcd = gcd(overallGcd, count);
+            }
+        }
+        return overallGcd >= 2;
     }
-        private int findGCD(int a, int b) {
-        if (b == 0) return a;
-        return findGCD(b, a % b);
+    private int gcd(int a, int b) {
+        while (b != 0) {
+            int temp = b;
+            b = a % b;
+            a = temp;
+        }
+        return a;
     }
 }
